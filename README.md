@@ -10,7 +10,7 @@ A simple plugin that allows players to select name tags through advancement
 
 ## Installation
 
-1. Download the plugin from [GitHub](https://github.com/XingyanTW/Advancement-Nametag/releases).
+1. Download the plugin from [GitHub](https://github.com/xydesu/Advancement-Nametag/releases).
 2. Place the downloaded JAR file in the "plugins" folder.
 3. Restart your Minecraft server.
 
