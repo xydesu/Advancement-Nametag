@@ -1,7 +1,7 @@
 name: AdvancementNametag
 version: '${project.version}'
 main: me.xingyan.advancementnametag.AdvancementNametag
-api-version: 1.20
+api-version: 1.21
 author: xy
 folia-supported: true
 softdepend: [PlaceholderAPI]
