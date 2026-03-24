@@ -20,7 +20,9 @@ public final class AdvancementNametag extends JavaPlugin {
         saveDefaultConfig();
 
         //register command
-        getCommand("tags").setExecutor(new commandTags());
+        commandTags commandExecutor = new commandTags();
+        getCommand("tags").setExecutor(commandExecutor);
+        getCommand("tags").setTabCompleter(commandExecutor);
 
         //register event
         this.getServer().getPluginManager().registerEvents(new guiNametag(), this);

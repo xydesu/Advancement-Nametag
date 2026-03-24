@@ -76,6 +76,9 @@ public class guiNametag implements Listener {
         ItemStack reset = new ItemStack(Material.BARRIER);
         ItemMeta resetMeta = reset.getItemMeta();
         resetMeta.displayName(Component.text("Reset").color(NamedTextColor.RED));
+        resetMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DYE, ItemFlag.HIDE_ENCHANTS,
+                ItemFlag.HIDE_PLACED_ON, ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_DESTROYS,
+                ItemFlag.HIDE_ARMOR_TRIM, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         reset.setItemMeta(resetMeta);
         inv.addItem(reset);
 
@@ -87,8 +90,10 @@ public class guiNametag implements Listener {
             if(player.getAdvancementProgress(advancement).isDone()) {
                 ItemStack item = new ItemStack(advancement.getDisplay().icon().getType());
                 ItemMeta meta = item.getItemMeta();
-                //hide flags
-                meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DYE, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_PLACED_ON, ItemFlag.HIDE_UNBREAKABLE);
+                //hide all item-type-specific flags so items are purely decorative
+                meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DYE, ItemFlag.HIDE_ENCHANTS,
+                        ItemFlag.HIDE_PLACED_ON, ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_DESTROYS,
+                        ItemFlag.HIDE_ARMOR_TRIM, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
 
                 if(advancement.getDisplay().frame().equals(AdvancementDisplay.Frame.CHALLENGE)){
                     meta.displayName(advancement.getDisplay().title().color(NamedTextColor.DARK_PURPLE).decoration(TextDecoration.ITALIC, false));
@@ -135,11 +140,17 @@ public class guiNametag implements Listener {
         ItemStack next = new ItemStack(Material.ARROW);
         ItemMeta nextMeta = next.getItemMeta();
         nextMeta.displayName(Component.text("Next Page").color(NamedTextColor.GREEN));
+        nextMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DYE, ItemFlag.HIDE_ENCHANTS,
+                ItemFlag.HIDE_PLACED_ON, ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_DESTROYS,
+                ItemFlag.HIDE_ARMOR_TRIM, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         next.setItemMeta(nextMeta);
         //previous page
         ItemStack previous = new ItemStack(Material.ARROW);
         ItemMeta previousMeta = previous.getItemMeta();
         previousMeta.displayName(Component.text("Previous Page").color(NamedTextColor.GREEN));
+        previousMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DYE, ItemFlag.HIDE_ENCHANTS,
+                ItemFlag.HIDE_PLACED_ON, ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_DESTROYS,
+                ItemFlag.HIDE_ARMOR_TRIM, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         previous.setItemMeta(previousMeta);
 
         if(!inv2.isEmpty()) {
@@ -208,7 +219,7 @@ public class guiNametag implements Listener {
             e.getWhoClicked().closeInventory();
             //add sound effect when click
             e.getWhoClicked().playSound(Sound.sound(org.bukkit.Sound.UI_BUTTON_CLICK, Sound.Source.PLAYER, 1f, 1f));
-            plugin.getDatabase().setNametag(String.valueOf(e.getWhoClicked().getUniqueId()), null, null);
+            plugin.getDatabase().setNametag(String.valueOf(e.getWhoClicked().getUniqueId()), null, null, null);
             return;
         }
 
@@ -278,13 +289,14 @@ public class guiNametag implements Listener {
             }
             String plain = PlainTextComponentSerializer.plainText().serialize(e.getCurrentItem().getItemMeta().displayName());
             String legacy = LegacyComponentSerializer.legacyAmpersand().serialize(e.getCurrentItem().getItemMeta().displayName());
+            String icon = e.getCurrentItem().getType().name();
 
             e.getWhoClicked().sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("message.set").replace("%tag%", plain)));
             e.getWhoClicked().closeInventory();
             //add sound effect when click
             e.getWhoClicked().playSound(Sound.sound(org.bukkit.Sound.UI_BUTTON_CLICK, Sound.Source.PLAYER, 1f, 1f));
 
-            plugin.getDatabase().setNametag(String.valueOf(e.getWhoClicked().getUniqueId()), plain, ChatColor.translateAlternateColorCodes('&', legacy));
+            plugin.getDatabase().setNametag(String.valueOf(e.getWhoClicked().getUniqueId()), plain, ChatColor.translateAlternateColorCodes('&', legacy), icon);
 
         }
 
