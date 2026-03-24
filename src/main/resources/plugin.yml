@@ -8,4 +8,11 @@ softdepend: [PlaceholderAPI]
 commands:
   tags:
     description: open a gui to set the nametag
-    usage: /<command>
+    usage: /<command> [reload|view <player>]
+permissions:
+  advancementnametag.use:
+    description: Allows players to open the tags GUI
+    default: true
+  advancementnametag.admin:
+    description: Allows access to admin subcommands (reload, view)
+    default: op

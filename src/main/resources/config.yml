@@ -2,3 +2,8 @@ message:
   reset: "&cYour nametag has been reset."
   set: "&aYour nametag has been set to %tag%."
   not-player: "&cYou must be a player to use this command."
+  no-permission: "&cYou do not have permission to use this command."
+  reload: "&aConfiguration reloaded successfully."
+  view-tag: "&b%player%'s current nametag: &f%tag%"
+  view-no-tag: "&b%player% &cdoes not have a nametag set."
+  player-not-found: "&cPlayer &f%player% &cwas not found."
