@@ -35,8 +35,7 @@ public final class AdvancementNametag extends JavaPlugin {
             database = new Database( getDataFolder().getAbsolutePath() + "/players.db");
 
         }catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("Faild to Connect to Database");
+            getLogger().severe("Failed to connect to database: " + e.getMessage());
             Bukkit.getPluginManager().disablePlugin(this);
         }
 
@@ -49,9 +48,9 @@ public final class AdvancementNametag extends JavaPlugin {
     public void onDisable() {
         // Plugin shutdown logic
         try {
-            database.closeConneciton();
+            database.closeConnection();
         } catch (SQLException e) {
-            e.printStackTrace();
+            getLogger().severe("Failed to close database connection: " + e.getMessage());
         }
     }
 

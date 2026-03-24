@@ -1,6 +1,6 @@
 package me.xingyan.advancementnametag;
 
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,7 +16,7 @@ public class commandTags implements CommandExecutor {
 
         //check if sender is player
         if(!(commandSender instanceof Player)) {
-            commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("message.notPlayer")));
+            commandSender.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(config.getString("message.not-player")));
             return true;
         }
         //open gui
