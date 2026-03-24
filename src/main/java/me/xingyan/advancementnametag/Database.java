@@ -23,7 +23,7 @@ public class Database {
         }
     }
 
-    public void closeConneciton() throws SQLException {
+    public void closeConnection() throws SQLException {
         if(connection != null && !connection.isClosed()){
             try {
                 connection.close();

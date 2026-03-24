@@ -33,8 +33,6 @@ public class guiNametag implements Listener {
 
     FileConfiguration config = plugin.getConfig();
 
-    private static final boolean isFolia = Bukkit.getVersion().contains("Folia");
-
     Database database = plugin.getDatabase();
 
     public static Inventory inv;
@@ -95,11 +93,11 @@ public class guiNametag implements Listener {
                 if(advancement.getDisplay().frame().equals(AdvancementDisplay.Frame.CHALLENGE)){
                     meta.displayName(advancement.getDisplay().title().color(NamedTextColor.DARK_PURPLE).decoration(TextDecoration.ITALIC, false));
                     //add glow
-                    meta.addEnchant(org.bukkit.enchantments.Enchantment.DURABILITY, 1, false);
+                    meta.addEnchant(org.bukkit.enchantments.Enchantment.UNBREAKING, 1, false);
                 }else if(advancement.getDisplay().frame().equals(AdvancementDisplay.Frame.GOAL)) {
                     meta.displayName(advancement.getDisplay().title().color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
                     //add glow
-                    meta.addEnchant(org.bukkit.enchantments.Enchantment.DURABILITY, 1, false);
+                    meta.addEnchant(org.bukkit.enchantments.Enchantment.UNBREAKING, 1, false);
                 } else {
                     meta.displayName(advancement.getDisplay().title().color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
                 }
@@ -188,11 +186,19 @@ public class guiNametag implements Listener {
     // Cancel dragging in our inventory
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) throws SQLException {
-        if (e.getInventory().equals(inv)) {
-            e.setCancelled(true);
-        }
+        Inventory clicked = e.getClickedInventory();
 
-        if (e.getClickedInventory().equals(e.getWhoClicked().getInventory())) {
+        // Ignore clicks outside any of the plugin's GUI pages
+        if (!e.getInventory().equals(inv) && !e.getInventory().equals(inv2) && !e.getInventory().equals(inv3)
+                && !e.getInventory().equals(inv4) && !e.getInventory().equals(inv5) && !e.getInventory().equals(inv6)
+                && !e.getInventory().equals(inv7) && !e.getInventory().equals(inv8) && !e.getInventory().equals(inv9)
+                && !e.getInventory().equals(inv10)) {
+            return;
+        }
+        e.setCancelled(true);
+
+        // Ignore clicks in the player's own inventory
+        if (clicked == null || clicked.equals(e.getWhoClicked().getInventory())) {
             return;
         }
 
@@ -211,23 +217,23 @@ public class guiNametag implements Listener {
             if(Objects.equals(e.getCurrentItem().getItemMeta().displayName(), Component.text("Next Page").color(NamedTextColor.GREEN))) {
                 e.getWhoClicked().closeInventory();
                 //check current page and open next page
-                if(e.getClickedInventory().equals(inv)) {
+                if(clicked.equals(inv)) {
                     e.getWhoClicked().openInventory(inv2);
-                } else if(e.getClickedInventory().equals(inv2)) {
+                } else if(clicked.equals(inv2)) {
                     e.getWhoClicked().openInventory(inv3);
-                } else if(e.getClickedInventory().equals(inv3)) {
+                } else if(clicked.equals(inv3)) {
                     e.getWhoClicked().openInventory(inv4);
-                } else if(e.getClickedInventory().equals(inv4)) {
+                } else if(clicked.equals(inv4)) {
                     e.getWhoClicked().openInventory(inv5);
-                } else if(e.getClickedInventory().equals(inv5)) {
+                } else if(clicked.equals(inv5)) {
                     e.getWhoClicked().openInventory(inv6);
-                } else if(e.getClickedInventory().equals(inv6)) {
+                } else if(clicked.equals(inv6)) {
                     e.getWhoClicked().openInventory(inv7);
-                } else if(e.getClickedInventory().equals(inv7)) {
+                } else if(clicked.equals(inv7)) {
                     e.getWhoClicked().openInventory(inv8);
-                } else if(e.getClickedInventory().equals(inv8)) {
+                } else if(clicked.equals(inv8)) {
                     e.getWhoClicked().openInventory(inv9);
-                } else if(e.getClickedInventory().equals(inv9)) {
+                } else if(clicked.equals(inv9)) {
                     e.getWhoClicked().openInventory(inv10);
                 }
 
@@ -240,23 +246,23 @@ public class guiNametag implements Listener {
             if(e.getCurrentItem().getItemMeta().displayName().equals(Component.text("Previous Page").color(NamedTextColor.GREEN))) {
                 e.getWhoClicked().closeInventory();
                 //check current page and open previous page
-                if(e.getClickedInventory().equals(inv2)) {
+                if(clicked.equals(inv2)) {
                     e.getWhoClicked().openInventory(inv);
-                } else if(e.getClickedInventory().equals(inv3)) {
+                } else if(clicked.equals(inv3)) {
                     e.getWhoClicked().openInventory(inv2);
-                } else if(e.getClickedInventory().equals(inv4)) {
+                } else if(clicked.equals(inv4)) {
                     e.getWhoClicked().openInventory(inv3);
-                } else if(e.getClickedInventory().equals(inv5)) {
+                } else if(clicked.equals(inv5)) {
                     e.getWhoClicked().openInventory(inv4);
-                } else if(e.getClickedInventory().equals(inv6)) {
+                } else if(clicked.equals(inv6)) {
                     e.getWhoClicked().openInventory(inv5);
-                } else if(e.getClickedInventory().equals(inv7)) {
+                } else if(clicked.equals(inv7)) {
                     e.getWhoClicked().openInventory(inv6);
-                } else if(e.getClickedInventory().equals(inv8)) {
+                } else if(clicked.equals(inv8)) {
                     e.getWhoClicked().openInventory(inv7);
-                } else if(e.getClickedInventory().equals(inv9)) {
+                } else if(clicked.equals(inv9)) {
                     e.getWhoClicked().openInventory(inv8);
-                } else if(e.getClickedInventory().equals(inv10)) {
+                } else if(clicked.equals(inv10)) {
                     e.getWhoClicked().openInventory(inv9);
                 }
                 e.getWhoClicked().playSound(Sound.sound(org.bukkit.Sound.UI_BUTTON_CLICK, Sound.Source.PLAYER, 1f, 1f));
@@ -266,10 +272,6 @@ public class guiNametag implements Listener {
 
         //click name tag and process console command
         if(e.getCurrentItem() != null){
-            //command string
-
-
-            //if item is name tag, do nothing
             //if item name is current nametag, do nothing
             if(e.getCurrentItem().getItemMeta().displayName().equals(Component.text("Current Nametag").color(NamedTextColor.GREEN))) {
                 return;
