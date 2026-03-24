@@ -5,8 +5,8 @@ A simple plugin that allows players to select name tags through advancement
 - **Advancement-Based Selection:** Players can pick name tags by completing advancements.
 
 ## Tested Version
-- **Folia:** 1.20.2
-- **Paper:** 1.20.1
+- **Folia:** 1.21.1
+- **Paper:** 1.21.1
 
 ## Installation
 
