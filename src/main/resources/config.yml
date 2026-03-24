@@ -7,3 +7,4 @@ message:
   view-tag: "&b%player%'s current nametag: &f%tag%"
   view-no-tag: "&b%player% &cdoes not have a nametag set."
   player-not-found: "&cPlayer &f%player% &cwas not found."
+  database-error: "&cFailed to retrieve nametag for &f%player%&c. Check database connection and server logs."

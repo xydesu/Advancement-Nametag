@@ -53,7 +53,14 @@ public class commandTags implements CommandExecutor, TabCompleter {
                 return true;
             }
             try {
-                String nametag = AdvancementNametag.plugin.getDatabase().getNametag(target.getUniqueId().toString());
+                Database db = AdvancementNametag.plugin.getDatabase();
+                if (db == null) {
+                    commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                            Objects.requireNonNull(config.getString("message.database-error"))
+                                    .replace("%player%", target.getName())));
+                    return true;
+                }
+                String nametag = db.getNametag(target.getUniqueId().toString());
                 if (nametag == null || nametag.isEmpty()) {
                     commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&',
                             Objects.requireNonNull(config.getString("message.view-no-tag"))
@@ -66,7 +73,9 @@ public class commandTags implements CommandExecutor, TabCompleter {
                 }
             } catch (SQLException e) {
                 AdvancementNametag.plugin.getLogger().severe("Database error looking up nametag for " + target.getName() + ": " + e.getMessage());
-                commandSender.sendMessage(ChatColor.RED + "Failed to retrieve nametag for " + target.getName() + ". Check database connection and server logs.");
+                commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                        Objects.requireNonNull(config.getString("message.database-error"))
+                                .replace("%player%", target.getName())));
             }
             return true;
         }
