@@ -20,6 +20,15 @@ public class Database {
                             Nametag TEXT,
                             Colored TEXT)
                     """);
+            // Migrate: add Icon column if it does not already exist
+            try {
+                statement.execute("ALTER TABLE Players ADD COLUMN Icon TEXT");
+            } catch (SQLException e) {
+                // Only ignore "duplicate column name" – rethrow anything unexpected
+                if (!e.getMessage().toLowerCase().contains("duplicate column name")) {
+                    throw e;
+                }
+            }
         }
     }
 
@@ -82,12 +91,26 @@ public class Database {
         return null;
     }
 
-    //set player's nametag and colored
-    public void setNametag(String uuid, String nametag, String colored) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement("UPDATE Players SET Nametag = ?, Colored = ? WHERE UUID = ?")) {
+    //get player's icon
+    public String getIcon(String uuid) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT Icon FROM Players WHERE UUID = ?")) {
+            statement.setString(1, uuid);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getString("Icon");
+                }
+            }
+        }
+        return null;
+    }
+
+    //set player's nametag, colored and icon
+    public void setNametag(String uuid, String nametag, String colored, String icon) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement("UPDATE Players SET Nametag = ?, Colored = ?, Icon = ? WHERE UUID = ?")) {
             statement.setString(1, nametag);
             statement.setString(2, colored);
-            statement.setString(3, uuid);
+            statement.setString(3, icon);
+            statement.setString(4, uuid);
             statement.executeUpdate();
         }
     }

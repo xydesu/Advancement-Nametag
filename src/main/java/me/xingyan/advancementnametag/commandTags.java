@@ -45,7 +45,7 @@ public class commandTags implements CommandExecutor, TabCompleter {
                 return true;
             }
             String targetName = args[1];
-            Player target = Bukkit.getPlayerExact(targetName);
+            Player target = Bukkit.getPlayer(targetName);
             if (target == null) {
                 commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&',
                         Objects.requireNonNull(config.getString("message.player-not-found"))

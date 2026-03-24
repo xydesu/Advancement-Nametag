@@ -219,7 +219,7 @@ public class guiNametag implements Listener {
             e.getWhoClicked().closeInventory();
             //add sound effect when click
             e.getWhoClicked().playSound(Sound.sound(org.bukkit.Sound.UI_BUTTON_CLICK, Sound.Source.PLAYER, 1f, 1f));
-            plugin.getDatabase().setNametag(String.valueOf(e.getWhoClicked().getUniqueId()), null, null);
+            plugin.getDatabase().setNametag(String.valueOf(e.getWhoClicked().getUniqueId()), null, null, null);
             return;
         }
 
@@ -289,13 +289,14 @@ public class guiNametag implements Listener {
             }
             String plain = PlainTextComponentSerializer.plainText().serialize(e.getCurrentItem().getItemMeta().displayName());
             String legacy = LegacyComponentSerializer.legacyAmpersand().serialize(e.getCurrentItem().getItemMeta().displayName());
+            String icon = e.getCurrentItem().getType().name();
 
             e.getWhoClicked().sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("message.set").replace("%tag%", plain)));
             e.getWhoClicked().closeInventory();
             //add sound effect when click
             e.getWhoClicked().playSound(Sound.sound(org.bukkit.Sound.UI_BUTTON_CLICK, Sound.Source.PLAYER, 1f, 1f));
 
-            plugin.getDatabase().setNametag(String.valueOf(e.getWhoClicked().getUniqueId()), plain, ChatColor.translateAlternateColorCodes('&', legacy));
+            plugin.getDatabase().setNametag(String.valueOf(e.getWhoClicked().getUniqueId()), plain, ChatColor.translateAlternateColorCodes('&', legacy), icon);
 
         }
 
