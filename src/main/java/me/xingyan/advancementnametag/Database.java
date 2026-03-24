@@ -3,28 +3,29 @@ package me.xingyan.advancementnametag;
 import org.bukkit.Bukkit;
 
 import java.sql.*;
+import java.util.Set;
 import java.util.UUID;
 
 public class Database {
 
     private final Connection connection;
 
-
     public Database(String path) throws SQLException {
         connection = DriverManager.getConnection("jdbc:sqlite:" + path);
         try (Statement statement = connection.createStatement()) {
             statement.execute("""
-                            CREATE TABLE IF NOT EXISTS Players (
-                            UUID TEXT PRIMARY KEY,
-                            Username TEXT NOT NULL,
-                            Nametag TEXT,
-                            Colored TEXT)
+                    CREATE TABLE IF NOT EXISTS Players (
+                        UUID TEXT PRIMARY KEY,
+                        Username TEXT NOT NULL,
+                        Nametag TEXT,
+                        Colored TEXT,
+                        Icon TEXT
+                    )
                     """);
-            // Migrate: add Icon column if it does not already exist
+            // Migrate: add Icon column when upgrading from an older schema
             try {
                 statement.execute("ALTER TABLE Players ADD COLUMN Icon TEXT");
             } catch (SQLException e) {
-                // Only ignore "duplicate column name" – rethrow anything unexpected
                 if (!e.getMessage().toLowerCase().contains("duplicate column name")) {
                     throw e;
                 }
@@ -33,80 +34,36 @@ public class Database {
     }
 
     public void closeConnection() throws SQLException {
-        if(connection != null && !connection.isClosed()){
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        if (connection != null && !connection.isClosed()) {
+            connection.close();
         }
     }
 
-    //add player to database
     public void addPlayer(String uuid) throws SQLException {
-        //if player is already in database
-        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM Players WHERE UUID = ?")) {
-            statement.setString(1, uuid);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return;
-                }
-            }
-        }
-
-        //add player to database
-        try (PreparedStatement statement = connection.prepareStatement("INSERT INTO Players (UUID, Username, Nametag, Colored) VALUES (?, ?, ?, ?)")) {
+        // INSERT OR IGNORE avoids a separate SELECT round-trip
+        try (PreparedStatement statement = connection.prepareStatement(
+                "INSERT OR IGNORE INTO Players (UUID, Username) VALUES (?, ?)")) {
             statement.setString(1, uuid);
             statement.setString(2, Bukkit.getOfflinePlayer(UUID.fromString(uuid)).getName());
-            statement.setString(3, null);
-            statement.setString(4, null);
             statement.executeUpdate();
         }
-
     }
 
-    //get player's nametag
     public String getNametag(String uuid) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement("SELECT Nametag FROM Players WHERE UUID = ?")) {
-            statement.setString(1, uuid);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return resultSet.getString("Nametag");
-                }
-            }
-        }
-        return null;
+        return queryColumn(uuid, "Nametag");
     }
 
-    //get player's colored
     public String getColored(String uuid) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement("SELECT Colored FROM Players WHERE UUID = ?")) {
-            statement.setString(1, uuid);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return resultSet.getString("Colored");
-                }
-            }
-        }
-        return null;
+        return queryColumn(uuid, "Colored");
     }
 
-    //get player's icon
     public String getIcon(String uuid) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement("SELECT Icon FROM Players WHERE UUID = ?")) {
-            statement.setString(1, uuid);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return resultSet.getString("Icon");
-                }
-            }
-        }
-        return null;
+        return queryColumn(uuid, "Icon");
     }
 
-    //set player's nametag, colored and icon
     public void setNametag(String uuid, String nametag, String colored, String icon) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement("UPDATE Players SET Nametag = ?, Colored = ?, Icon = ? WHERE UUID = ?")) {
+        try (PreparedStatement statement = connection.prepareStatement(
+                "UPDATE Players SET Nametag = ?, Colored = ?, Icon = ? WHERE UUID = ?")) {
             statement.setString(1, nametag);
             statement.setString(2, colored);
             statement.setString(3, icon);
@@ -115,4 +72,21 @@ public class Database {
         }
     }
 
+    private static final Set<String> VALID_COLUMNS = Set.of("Nametag", "Colored", "Icon");
+
+    private String queryColumn(String uuid, String column) throws SQLException {
+        if (!VALID_COLUMNS.contains(column)) {
+            throw new IllegalArgumentException("Invalid column name: " + column);
+        }
+        try (PreparedStatement statement = connection.prepareStatement(
+                "SELECT " + column + " FROM Players WHERE UUID = ?")) {
+            statement.setString(1, uuid);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getString(column);
+                }
+            }
+        }
+        return null;
+    }
 }

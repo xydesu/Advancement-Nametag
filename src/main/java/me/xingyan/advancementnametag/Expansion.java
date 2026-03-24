@@ -1,7 +1,6 @@
 package me.xingyan.advancementnametag;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,7 +8,7 @@ import java.sql.SQLException;
 
 public class Expansion extends PlaceholderExpansion {
 
-    Database database = AdvancementNametag.plugin.getDatabase();
+    private final Database database = AdvancementNametag.getInstance().getDatabase();
 
     @Override
     public @NotNull String getIdentifier() {
@@ -23,47 +22,33 @@ public class Expansion extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getVersion() {
-        return Bukkit.getPluginManager().getPlugin("AdvancementNametag").getDescription().getVersion();
+        return AdvancementNametag.getInstance().getDescription().getVersion();
     }
 
     @Override
     public String onRequest(OfflinePlayer player, @NotNull String params) {
-        if (params.equalsIgnoreCase("tag")) {
-            try {
-                if(database.getNametag(player.getUniqueId().toString()) == null)
-                    return "";
-                return database.getNametag(player.getUniqueId().toString());
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+        String uuid = player.getUniqueId().toString();
+        try {
+            return switch (params.toLowerCase()) {
+                case "tag" -> {
+                    String tag = database.getNametag(uuid);
+                    yield tag != null ? tag : "";
+                }
+                case "colored" -> {
+                    String colored = database.getColored(uuid);
+                    yield colored != null ? colored : "";
+                }
+                case "icon" -> {
+                    String icon = database.getIcon(uuid);
+                    yield icon != null ? icon : "";
+                }
+                case "hastag" -> database.getNametag(uuid) != null ? "true" : "false";
+                default -> null;
+            };
+        } catch (SQLException e) {
+            AdvancementNametag.getInstance().getLogger().warning(
+                    "Database error handling placeholder '" + params + "' for " + player.getName() + ": " + e.getMessage());
+            return null;
         }
-        if (params.equalsIgnoreCase("colored")) {
-            try {
-                if(database.getColored(player.getUniqueId().toString()) == null)
-                    return "";
-                return database.getColored(player.getUniqueId().toString());
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        if (params.equalsIgnoreCase("icon")) {
-            try {
-                String icon = database.getIcon(player.getUniqueId().toString());
-                if(icon == null)
-                    return "";
-                return icon;
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        if (params.equalsIgnoreCase("hasTag")) {
-            try {
-                return database.getNametag(player.getUniqueId().toString()) != null ? "true" : "false";
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return null; //
     }
-
 }
